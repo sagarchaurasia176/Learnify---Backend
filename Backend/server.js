@@ -13,12 +13,16 @@ const app = express();
 require("dotenv").config();
 // dbconnection
 const dbConnectionFunctionCall = require("./config/Edtechdb");
-// All routes 
+// All routes
 const CourseRouter = require("./routes/Course");
-app.use('/api/Courses' ,CourseRouter);
+const PaymentRoutes = require("./routes/Payment");
+const ProfileRoutes = require("./routes/Profile");
+const UserRoutes = require("./routes/User");
 
-
-
+app.use("/api/Courses", CourseRouter);
+app.use("/api/Payment", PaymentRoutes);
+app.use("/api/Profile", ProfileRoutes);
+app.use("/api/User", UserRoutes);
 
 // Port listen
 const PORT = process.env.PORT || 8000;

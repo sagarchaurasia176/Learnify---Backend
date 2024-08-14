@@ -1,26 +1,27 @@
 const express = require("express");
-const UserRoutes = express.Router();
 const {
-    sendOtp,
-    singup,
-    login,
-    changePassword,
+  otpSendToTheClient,
+  signup,
+  login,
+  changePassword,
 } = require("../controller/Auth");
-// reset password token generatre
+
+// userRoutes for login
+const UserRoutes = express.Router();
+
 const {
-    resetPasswordToken,
-    resetPasswords,
+  resetPasswordToken,
+  resetPasswords,
 } = require("../controller/ResetPassword");
 //middleware
 const { authsCheck } = require("../middleware/authsMiddleware");
-
 // routes for
 //  user login
 UserRoutes.post("/login", login);
 //SINGUP
-UserRoutes.post("/singup", singup);
+UserRoutes.post("/singup", signup);
 //send otp
-UserRoutes.post("/sendOtp", sendOtp);
+// UserRoutes.post("/sendOtp", sendOtp);
 //change passwrod
 UserRoutes.post("/changePassword", authsCheck, changePassword);
 
