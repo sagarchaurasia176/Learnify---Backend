@@ -6,7 +6,7 @@ const Profile = require("../model/Profile");
 const jwt = require("jsonwebtoken");
 
 // Send OTP code
-exports.sendOtp = async (req, res) => {
+exports.otpSendToTheClient = async (req, res) => {
   try {
     const { email } = req.body;
     const checkUserPresent = await User.findOne({ email: email });
@@ -67,7 +67,14 @@ exports.signup = async (req, res) => {
     } = req.body;
 
     // Validations
-    if (!firstName || !lastName || !email || !password || !confirmPassword || !otp) {
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !otp
+    ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required!",
@@ -92,7 +99,9 @@ exports.signup = async (req, res) => {
     }
 
     // Find the most recent OTP
-    const recentOtp = await Otp.find({ email: email }).sort({ createdAt: -1 }).limit(1);
+    const recentOtp = await Otp.find({ email: email })
+      .sort({ createdAt: -1 })
+      .limit(1);
     if (recentOtp.length === 0) {
       return res.status(400).json({
         success: false,
@@ -154,7 +163,9 @@ exports.login = async (req, res) => {
     }
 
     // Check if the email exists
-    const user = await User.findOne({ email: email }).populate("additionalDetails");
+    const user = await User.findOne({ email: email }).populate(
+      "additionalDetails"
+    );
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -211,7 +222,10 @@ exports.changePassword = async (req, res) => {
     const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
     // Validate old password
-    const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
+    const isPasswordMatch = await bcrypt.compare(
+      oldPassword,
+      userDetails.password
+    );
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,

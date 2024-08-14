@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const { instance } = require("../config/RazorPay");
-const { courseEnrollmentEmail } = require("../Mail/CourseEnrollment");
+// const { courseEnrollmentEmail } = require("../Mail/CourseEnrollment");
 const Courses = require("../model/Courses");
 const Users = require("../model/User");
 const mailSender = require("../utils/MailSender");
