@@ -1,7 +1,13 @@
 const express = require("express");
+const {
+  otpSendToTheClient,
+  signup,
+  login,
+  changePassword,
+} = require("../controller/Auth");
+
+// userRoutes for login
 const UserRoutes = express.Router();
-
-
 
 const {
   resetPasswordToken,
@@ -13,7 +19,7 @@ const { authsCheck } = require("../middleware/authsMiddleware");
 //  user login
 UserRoutes.post("/login", login);
 //SINGUP
-UserRoutes.post("/singup", singup);
+UserRoutes.post("/singup", signup);
 //send otp
 // UserRoutes.post("/sendOtp", sendOtp);
 //change passwrod
