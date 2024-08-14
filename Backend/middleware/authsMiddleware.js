@@ -1,16 +1,11 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const User = require("../model/User");
 
 // Main auth middleware
 exports.authsCheck = async (req, res, next) => {
   try {
-    const token =
-      req.cookies.token || // Note: 'req.cookies' not 'req.Cookies'
-      req.body.token ||
-      req.header("Authorization").replace("Bearer ", "");
-
-    // Check if token is missing
+    const token =// Note: 'req.cookies' not 'req.Cookies'
+      req.body.token    // Check if token is missing
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -22,6 +17,7 @@ exports.authsCheck = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.Secret_token);
       req.user = decoded; // Note: 'req.user' not 'req.User'
+      console.log("token in auth middlware" , decoded);
     } catch (err) {
       return res.status(401).json({
         success: false,

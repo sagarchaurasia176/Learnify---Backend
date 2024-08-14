@@ -13,17 +13,12 @@ const app = express();
 require("dotenv").config();
 // dbconnection
 const dbConnectionFunctionCall = require("./config/Edtechdb");
+// All routes 
+const CourseRouter = require("./routes/Course");
+app.use('/api/Courses' ,CourseRouter);
 
-// Multiple routes for different routes
-const CourseRoutes = require("./routes/Course");
-// const PaymentRoutes = require("./routes/Payment");
-// const ProfileRoutes = require("./routes/Profile");
-// const UserRoutes = require("./routes/User");
-// // routes
-// app.use("/api/v1/auth", UserRoutes);
-app.use("/api/v1/Courses", CourseRoutes);
-// app.use("/api/v1/Profile", ProfileRoutes);
-// app.use("/api/v1/Payment", PaymentRoutes);
+
+
 
 // Port listen
 const PORT = process.env.PORT || 8000;
@@ -42,7 +37,7 @@ app.use(
   })
 );
 
-// file upload middleware
+// file upload middleware to the cloudinary
 app.use(
   fileUpload({
     useTempFiles: true,
