@@ -2,7 +2,7 @@ const Sections = require("../model/Section");
 const SubSections = require("../model/SubSection");
 const CourseSections = require("../model/Courses");
 // create course sections here first
-const createCourse = async (req, res) => {
+exports.createSection = async (req, res) => {
   try {
     //data fetch
     const { SectionName, CourseId } = req.body;
@@ -27,7 +27,6 @@ const createCourse = async (req, res) => {
     // return the response
     return res.status(200).json({
       success: true,
-      data: updateSection,
       message: "secton Create succefully!",
     });
   } catch (er) {

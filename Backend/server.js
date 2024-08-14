@@ -13,11 +13,13 @@ const app = express();
 require("dotenv").config();
 // dbconnection
 const dbConnectionFunctionCall = require("./config/Edtechdb");
-// Multiple routes for different routes
-const CourseRoutes = require("./routes/Course");
-const PaymentRoutes = require("./routes/Payment");
-const ProfileRoutes = require("./routes/Profile");
-const UserRoutes = require("./routes/User");
+// All routes 
+const CourseRouter = require("./routes/Course");
+app.use('/api/Courses' ,CourseRouter);
+
+
+
+
 // Port listen
 const PORT = process.env.PORT || 8000;
 // connectious mountings
@@ -35,7 +37,7 @@ app.use(
   })
 );
 
-// file upload middleware
+// file upload middleware to the cloudinary
 app.use(
   fileUpload({
     useTempFiles: true,
@@ -45,12 +47,6 @@ app.use(
 
 // connection to cloudinary
 MediaUploaderToCloud();
-
-// routes
-app.use("/api/v1/auth", UserRoutes);
-app.use("/api/v1/Courses", CourseRoutes);
-app.use("/api/v1/Profile", ProfileRoutes);
-app.use("/api/v1/Payment", PaymentRoutes);
 
 // defalut routes
 app.get("/", (req, res) => {

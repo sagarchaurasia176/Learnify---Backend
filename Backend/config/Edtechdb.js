@@ -12,7 +12,7 @@ const connectWithMongoDB = (req, res) => {
     })
     .catch((er) => {
       console.log("Databse not connected succesfully!");
-      console.error(er);
+      console.error(er.message);
     });
 };
 

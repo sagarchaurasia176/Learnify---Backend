@@ -1,103 +1,94 @@
-// This middleware is basically the application based middleware
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const User = require("../model/User");
 
-// main auth apply here
+// Main auth middleware
 exports.authsCheck = async (req, res, next) => {
   try {
-    const token =
-      req.Cookies.token ||
-      req.body.token ||
-      req.header("Authorisation").replace("Bearer", "");
-    // check if token missing
+    const token =// Note: 'req.cookies' not 'req.Cookies'
+      req.body.token    // Check if token is missing
     if (!token) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
-        message: "token is misssing at middleware!",
-        error: er.message,
+        message: "Token is missing at middleware!",
       });
     }
 
-    // token verify
+    // Verify token
     try {
-      let decoded = jwt.verify(token, process.env.Secret_token);
-      req.User = decoded;
-    } catch (er) {
-      return res.status(404).json({
+      const decoded = jwt.verify(token, process.env.Secret_token);
+      req.user = decoded; // Note: 'req.user' not 'req.User'
+      console.log("token in auth middlware" , decoded);
+    } catch (err) {
+      return res.status(401).json({
         success: false,
-        message: "token is invalid",
-        error: er.message,
+        message: "Token is invalid",
+        error: err.message,
       });
     }
 
     next();
-  } catch (er) {
-    return res.status(404).json({
+  } catch (err) {
+    return res.status(500).json({
       success: false,
-      message: "something went wrong while validating",
-      error: er.message,
+      message: "Something went wrong while validating the token",
+      error: err.message,
     });
   }
 };
 
 // isStudent middleware
-exports.isStudent = async (req, res, next) => {
+exports.isStudent = (req, res, next) => {
   try {
-    // is student middleware check
-    if (req.User.accountType !== "Student") {
-      return res.status(404).json({
+    if (req.user.accountType !== "Student") {
+      return res.status(403).json({
         success: false,
-        message: "Protected route only for student ",
-        error: er.message,
+        message: "Protected route: only for students",
       });
     }
     next();
-  } catch (er) {
-    return res.status(404).json({
+  } catch (err) {
+    return res.status(500).json({
       success: false,
-      message: "Instructor role cannot be verified  ",
-      error: er.message,
+      message: "Student role cannot be verified",
+      error: err.message,
     });
   }
 };
 
-// isInstructor  middleware
-exports.isInstructor = async (req, res, next) => {
+// isInstructor middleware
+exports.isInstructor = (req, res, next) => {
   try {
-    // is student middleware check
-    if (req.User.accountType !== "Instructor") {
-      return res.status(404).json({
+    if (req.user.accountType !== "Instructor") {
+      return res.status(403).json({
         success: false,
-        message: "Protected route only for Instructor",
-        error: er.message,
+        message: "Protected route: only for instructors",
       });
     }
-  } catch (er) {
-    return res.status(404).json({
+    next();
+  } catch (err) {
+    return res.status(500).json({
       success: false,
-      message: "Instructor role cannot be verified  ",
-      error: er.message,
+      message: "Instructor role cannot be verified",
+      error: err.message,
     });
   }
 };
 
-// isAdmn role middleware
-exports.isAdmin = async (req, res, next) => {
+// isAdmin middleware
+exports.isAdmin = (req, res, next) => {
   try {
-    // is student middleware check
-    if (req.User.accountType !== "Instructor") {
-      return res.status(404).json({
+    if (req.user.accountType !== "Admin") { // Fixed role check
+      return res.status(403).json({
         success: false,
-        message: "Protected route only for Instructor",
-        error: er.message,
+        message: "Protected route: only for admins",
       });
     }
-  } catch (er) {
-    return res.status(404).json({
+    next();
+  } catch (err) {
+    return res.status(500).json({
       success: false,
-      message: "Instructor role cannot be verified  ",
-      error: er.message,
+      message: "Admin role cannot be verified",
+      error: err.message,
     });
   }
 };

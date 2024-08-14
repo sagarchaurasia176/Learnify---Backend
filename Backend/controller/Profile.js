@@ -3,88 +3,112 @@ const User = require("../model/User");
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { dateOFBirth = "", about = "", contactNumber, gender } = req.body;
-    //get userId
-    const id = req.User.id;
-    //validation
-    if (!contactNumber || !gender || !about || !dateOFBirth) {
-      return res.status(404).json({
+    const { dateOfBirth, about, contactNumber, gender } = req.body;
+    const id = req.user.id; // Note: `req.user.id`, not `req.User.id`
+    
+    // Validation
+    if (!contactNumber || !gender || !about || !dateOfBirth) {
+      return res.status(400).json({
         success: false,
         message: "All fields are required!",
-        error: er.message,
       });
     }
-    const userDetails = await User.findById(id);
-    const ProfileId = userDetails.additionalDetails;
-    const ProfileDetails = await Profile.findById(ProfileId);
-    // update profile
-    ProfileDetails.dateOFBirth = dateOFBirth;
-    ProfileDetails.about = about;
-    ProfileDetails.gender = gender;
-    ProfileDetails.contactNumber = contactNumber;
 
-    // await save to the databse
-    await ProfileDetails.save();
-    return res.status(200).json({
-      success: true,
-      message: "Profile Updated Succesfully!",
-    });
-  } catch (er) {
-    return res.status(404).json({
-      success: false,
-      message: "Profile not created!",
-      error: er.message,
-    });
-  }
-};
-
-// delete accounts
-exports.ProfileDeleteAccount = async (req, res) => {
-  try {
-    const id = req.User.id;
     const userDetails = await User.findById(id);
     if (!userDetails) {
       return res.status(404).json({
         success: false,
-        message: "user not found!",
-        error: er.message,
+        message: "User not found!",
       });
     }
-    //delete profile
-    await Profile.findByIdAndDelete({ _id: userDetails.additionalDetails });
-    await User.findByIdAndDelete({ _id: id });
 
-    // return response
+    const profileId = userDetails.additionalDetails;
+    const profileDetails = await Profile.findById(profileId);
+    if (!profileDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found!",
+      });
+    }
+
+    // Update profile
+    profileDetails.dateOfBirth = dateOfBirth;
+    profileDetails.about = about;
+    profileDetails.gender = gender;
+    profileDetails.contactNumber = contactNumber;
+
+    // Save to the database
+    await profileDetails.save();
+
     return res.status(200).json({
       success: true,
-      message: "user profiel deleted succesfully!",
+      message: "Profile updated successfully!",
     });
-  } catch (er) {
-    return res.status(400).json({
+  } catch (error) {
+    return res.status(500).json({
       success: false,
-      message: "user profile not deleted succesfully!",
+      message: "Profile update failed!",
+      error: error.message,
     });
   }
 };
 
-// how to apply the job - chron job
+// Delete account
+exports.ProfileDeleteAccount = async (req, res) => {
+  try {
+    const id = req.user.id; // Note: `req.user.id`, not `req.User.id`
 
-// userAll details
-exports.getUserDetails = async(req,res) =>{
-  try{
-      const id = req.User.id;
-      const userDetails = await User.findById(id).populate("additionalDetails").exec();
-      //valid 
-      return res.status(200).json({
-          success: true,
-          message: "user data received!",
-          data:userDetails,
-        });
-      //response
-  }catch(er){
-      return res.status(400).json({
-          success: false,
-          message: "user details not received !",
-        });
+    const userDetails = await User.findById(id);
+    if (!userDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    // Delete profile and user
+    await Profile.findByIdAndDelete(userDetails.additionalDetails);
+    await User.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "User profile deleted successfully!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "User profile deletion failed!",
+      error: error.message,
+    });
   }
-}
+};
+
+// Get user details
+exports.getUserDetails = async (req, res) => {
+  try {
+    const id = req.user.id; // Note: `req.user.id`, not `req.User.id`
+    
+    const userDetails = await User.findById(id)
+      .populate("additionalDetails")
+      .exec();
+
+    if (!userDetails) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User data received!",
+      data: userDetails,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve user details!",
+      error: error.message,
+    });
+  }
+};

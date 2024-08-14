@@ -1,73 +1,95 @@
 const express = require("express");
-const CourseRoutes = express.Router();
-
+const CourseRouter = express.Router();
+// courses controller functions
 const {
   createCourses,
   getAllCourses,
-  CourseDetais,
+  CourseDetails,
 } = require("../controller/Courses");
-// categroy controller
 const {
   createCategory,
   categoryPageDetails,
 } = require("../controller/Category");
-// sections
 const {
-  createCourse,
-  updateSection,
+  createSection,
   deleteSections,
+  updateSection,
 } = require("../controller/Sections");
-// subsections
 const {
   CreateSubSection,
-  updateSubSections,
+  updateSubSection,
   deleteSubSection,
 } = require("../controller/SubSection");
-//Routing controller improt
 const {
   CreateRating,
-  getAverageRating,
   getAverageAllRating,
+  getAverageRating,
 } = require("../controller/rateAndReviews");
-
-// import all the middleware
+// Middlewwares apply here
 const {
   authsCheck,
   isStudent,
   isInstructor,
   isAdmin,
 } = require("../middleware/authsMiddleware");
+// all the courses  routes
+CourseRouter.post("/api/createCourse", authsCheck, isInstructor, createCourses);
 
-// course croutes creations
-CourseRoutes.post("/createCourse", authsCheck, isInstructor, createCourse);
-CourseRoutes.post("/addSection", authsCheck, isInstructor, createCourse);
-CourseRoutes.post("/updateSection", authsCheck, isInstructor, updateSection);
-CourseRoutes.post("/deleteSection", authsCheck, isInstructor, deleteSections);
-CourseRoutes.post(
-  "/updateSubSection",
+// This are the basic details thats why not used the route
+CourseRouter.get("/api/AllCourses", getAllCourses);
+CourseRouter.post("/api/CourseDetails", CourseDetails);
+
+// category controllers
+CourseRouter.post("/api/category", authsCheck, isAdmin, createCategory);
+CourseRouter.post("/api/categoryDetails", categoryPageDetails);
+
+// pedning show all categeory
+
+// create section controllers
+CourseRouter.post(
+  "/api/createSection",
   authsCheck,
   isInstructor,
-  updateSubSections
+  createSection
 );
-CourseRoutes.post(
-  "/deleteSubSection",
+CourseRouter.post(
+  "/api/deleteSection",
+  authsCheck,
+  isInstructor,
+  updateSection
+);
+CourseRouter.post(
+  "/api/updateSection",
+  authsCheck,
+  isInstructor,
+  deleteSections
+);
+
+//create sub sections controller
+CourseRouter.post(
+  "/api/createSubSection",
+  authsCheck,
+  isInstructor,
+  CreateSubSection
+);
+CourseRouter.post(
+  "/api/upadteSubSection",
+  authsCheck,
+  isInstructor,
+  updateSubSection
+);
+CourseRouter.post(
+  "/api/deleteSubSection",
   authsCheck,
   isInstructor,
   deleteSubSection
 );
-CourseRoutes.post("/addSubSection", authsCheck, isInstructor, CreateSubSection);
-CourseRoutes.post("/getAllCourses", getAllCourses);
-CourseRoutes.post("/CourseDetails", CourseDetais);
 
-// category Routes
-CourseRoutes.post("/createCategory", authsCheck, isAdmin, createCategory);
-CourseRoutes.get("/showAllCategory", categoryPageDetails);
-CourseRoutes.post("/getCategoryPageDetails", categoryPageDetails);
+// middelwares
 
-// rating and reviews
+CourseRouter.post("/api/rating", authsCheck, isStudent, CreateRating);
+CourseRouter.get("/api/getRating", getAverageAllRating);
+CourseRouter.get("/api/getAvergaeRating", getAverageRating);
 
-CourseRoutes.post("/createRating", authsCheck, isStudent, CreateRating);
-CourseRoutes.get("/getAverageRating", getAverageRating);
-CourseRoutes.get("/getReviews", getAverageAllRating);
-
-module.exports = CourseRoutes;
+// Coures Routers
+module.exports = CourseRouter;

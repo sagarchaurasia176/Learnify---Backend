@@ -19,12 +19,12 @@ const MailSender = async (email, title, body) => {
       subject: `${title}`,
       html: `${body}`,
     });
-    console.log("",message)
-    return message
-    // error response apply here 
-  } catch (er){
-    console.error(er.message)
-    console.log("nodemailer error!")
+    console.log("", message);
+    return message;
+    // error response apply here
+  } catch (er) {
+    console.error(er.message);
+    console.log("nodemailer error!");
   }
 };
 
