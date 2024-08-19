@@ -1,16 +1,28 @@
 const Otp = require("../model/Otp");
 const User = require("../model/User");
-const otpGenerator = require("otp-generator");
-const bcrypt = require("bcrypt");
 const Profile = require("../model/Profile");
+// PACKAGES
+const bcrypt = require("bcrypt");
+const otpGenerator = require("otp-generator");
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
-// Send OTP code
+// body parser
+// opt send to the clients 
 exports.otpSendToTheClient = async (req, res) => {
   try {
-    const { email } = req.body;
-    const checkUserPresent = await User.findOne({ email: email });
+    const {password} = req.body;
+    console.log(password);
+    // email 
+    if(!email){
+      return res.status(200).json({
+        success: false,
+        message: "email field empty!",
+      });
+    }
 
+    const checkUserPresent = await User.findOne({ email: email });
+    console.log("email id", checkUserPresent);
     // Check if the email exists
     if (checkUserPresent) {
       return res.status(400).json({
@@ -18,41 +30,33 @@ exports.otpSendToTheClient = async (req, res) => {
         message: "Email already exists!",
       });
     }
-
     // Generate the OTP
-    let otp = otpGenerator.generate(5, {
+    let otpGenerate = await otpGenerator.generate(5, {
       upperCaseAlphabets: false,
       specialChars: false,
     });
-
-    // Ensure the OTP is unique
-    let otpResult = await Otp.findOne({ otp: otp });
-    while (otpResult) {
-      otp = otpGenerator.generate(5, {
-        upperCaseAlphabets: false,
-        specialChars: false,
-      });
-      otpResult = await Otp.findOne({ otp: otp });
-    }
-
-    const otpPayload = { email, otp };
-    await Otp.create(otpPayload);
-
-    // Return the response
+    const otpStored = await Otp.create({ email, otp: otpGenerate });
+    console.log("otp ", otpStored);
+    // Instead of sending the OTP directly, send a success message
     return res.status(200).json({
       success: true,
       message: "OTP sent successfully!",
+      otpStored,
+      otpGenerate
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(404).json({
       success: false,
-      message: "Error in Auth controller!",
+      message: "Error in Auth controller! in otp part",
       error: error.message,
     });
   }
 };
 
-// User registration controller
+
+
+
+// User registration controller signup parts
 exports.signup = async (req, res) => {
   try {
     const {
@@ -102,6 +106,7 @@ exports.signup = async (req, res) => {
     const recentOtp = await Otp.find({ email: email })
       .sort({ createdAt: -1 })
       .limit(1);
+
     if (recentOtp.length === 0) {
       return res.status(400).json({
         success: false,

@@ -2,6 +2,10 @@ const express = require("express");
 // frontend  + backend conenction requrired cors
 const cors = require("cors");
 //file upload
+const bodyParser = require("body-parser");
+
+//body-parser
+
 const fileUpload = require("express-fileupload");
 // cloudinary connected
 const MediaUploaderToCloud = require("./utils/MediaUploderToCloud");
@@ -30,6 +34,11 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 // dbconnection
 dbConnectionFunctionCall();
+
+// body parser
+
+/*assuming an express app is declared here*/
+app.use(bodyParser.json());
 
 // cookie parser
 app.use(cookieParser());

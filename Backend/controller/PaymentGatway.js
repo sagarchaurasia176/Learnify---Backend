@@ -4,7 +4,7 @@ const { instance } = require("../config/RazorPay");
 const Courses = require("../model/Courses");
 const Users = require("../model/User");
 const mailSender = require("../utils/MailSender");
-
+require('dotenv').config();
 // create the payment and instance it
 exports.paymentGateway = async (req, res) => {
   try {

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const MailSender = require("../utils/MailSender");
+
+// OTP Schema
 const OtpSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -12,32 +14,33 @@ const OtpSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
-    expires: 5 * 60,
+    expires: 5 * 60, // 5 minutes expiration
   },
 });
 
-// a fucntion => which transform the mails directly to the server
-async function otpMailTransfterDirectlyToTheServer(email, otp) {
+// Function to send the OTP via email
+async function otpMailTransferDirectlyToTheServer(email, otp) {
   try {
     const mailResponse = await MailSender(
       email,
-      "verification Email  from edtech ",
-      otp
+      "Verification Email from EdTech",
+      `Your OTP is: ${otp}`
     );
-    console.log(mailResponse);
-  } catch {
-    console.log("error in opt schema");
+    console.log("Mail Response:", mailResponse);
+  } catch (err) {
+    console.error("Error at OTP Mail Transfer:", err);
+    throw err; // Throw the error to stop the OTP from being saved
   }
 }
 
-// preSaved middleware for sending previous logics 
-// its basically contained the schema for middleware purpose
-
-    OtpSchema.pre('save' , async function(next){
-        await otpMailTransfterDirectlyToTheServer(this.email , this.otp);
-    // passed the middleware 
-        next();
-    })
-
+// Mongoose Pre-save Middleware
+OtpSchema.pre("save", async function (next) {
+  try {
+    await otpMailTransferDirectlyToTheServer(this.email, this.otp);
+    next(); // Proceed to save the OTP in the database
+  } catch (err) {
+    console.log("error at otp side", err);
+  }
+});
 
 module.exports = mongoose.model("Otp", OtpSchema);
